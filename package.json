@@ -1,0 +1,127 @@
+{
+    "name": "mcp-server-installer",
+    "displayName": "MCP-Server-Installer",
+    "description": "Register MCP servers via extension settings and provide them to VS Code",
+    "version": "0.0.1",
+    "publisher": "mcp-server-installer",
+    "engines": {
+        "vscode": "^1.99.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "mcpServerDefinitionProviders": [
+            {
+                "id": "mcp-server-installer",
+                "label": "MCP-Server-Installer"
+            }
+        ],
+        "configuration": {
+            "title": "MCP-Server-Installer",
+            "properties": {
+                "mcpServerInstaller.servers": {
+                    "type": "array",
+                    "default": [],
+                    "markdownDescription": "List of MCP servers to register. Each entry defines either a **stdio** or **http** server.",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name",
+                            "type"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Display name of the MCP server"
+                            },
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "stdio",
+                                    "http"
+                                ],
+                                "description": "Transport type: 'stdio' for local process, 'http' for remote HTTP endpoint"
+                            },
+                            "command": {
+                                "type": "string",
+                                "description": "(stdio) Command to start the server process"
+                            },
+                            "args": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "default": [],
+                                "description": "(stdio) Command-line arguments"
+                            },
+                            "env": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": [
+                                        "string",
+                                        "number",
+                                        "null"
+                                    ]
+                                },
+                                "default": {},
+                                "description": "(stdio) Environment variables. Set to null to remove a variable."
+                            },
+                            "cwd": {
+                                "type": "string",
+                                "description": "(stdio) Working directory for the server process"
+                            },
+                            "url": {
+                                "type": "string",
+                                "description": "(http) Server endpoint URL"
+                            },
+                            "headers": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                },
+                                "default": {},
+                                "description": "(http) Additional HTTP headers"
+                            }
+                        },
+                        "if": {
+                            "properties": {
+                                "type": {
+                                    "const": "stdio"
+                                }
+                            }
+                        },
+                        "then": {
+                            "required": [
+                                "name",
+                                "type",
+                                "command"
+                            ]
+                        },
+                        "else": {
+                            "required": [
+                                "name",
+                                "type",
+                                "url"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "scripts": {
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "lint": "eslint src"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.99.0",
+        "@types/node": "^20.0.0",
+        "typescript": "^5.7.0"
+    }
+}
